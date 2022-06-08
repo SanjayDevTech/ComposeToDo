@@ -9,10 +9,7 @@ import androidx.compose.ui.res.stringResource
 import com.sanjaydevtech.composetodo.R
 
 @Composable
-fun ActionBar(onAddClick: () -> Unit, onSettingsClick: () -> Unit, onToggle: () -> Unit) {
-    var showMenu by remember {
-        mutableStateOf(false)
-    }
+fun ActionBar( onSettingsClick: () -> Unit, onToggle: () -> Unit) {
     TopAppBar(title = {
         Text(stringResource(id = R.string.app_name))
     },
@@ -23,25 +20,12 @@ fun ActionBar(onAddClick: () -> Unit, onSettingsClick: () -> Unit, onToggle: () 
                     contentDescription = "Invert"
                 )
             }
-            IconButton(onClick = { showMenu = !showMenu }) {
-                Icon(Icons.Default.MoreVert, "")
+            IconButton(onClick = onSettingsClick) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_baseline_settings_24),
+                    contentDescription = "Settings"
+                )
             }
-            DropdownMenu(
-                expanded = showMenu,
-                onDismissRequest = { showMenu = false }
-            ) {
-                DropdownMenuItem(onClick = {
-                    onAddClick()
-                    showMenu = false
-                }) {
-                    Text("Add Todo")
-                }
-                DropdownMenuItem(onClick = {
-                    onSettingsClick()
-                    showMenu = false
-                }) {
-                    Text("Settings")
-                }
-            }
+
         })
 }

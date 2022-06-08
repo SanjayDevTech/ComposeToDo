@@ -16,9 +16,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.sample.library.Config
 import com.sample.library.Logger
+import com.sanjaydevtech.composetodo.R
 import com.sanjaydevtech.composetodo.getConfig
 import com.sanjaydevtech.composetodo.model.ToDo
 import com.sanjaydevtech.composetodo.setConfig
@@ -46,19 +48,25 @@ class MainActivity : ComponentActivity() {
             val scope = rememberCoroutineScope()
             val list = mainViewModel.toDoList
             ComposeToDoTheme(darkTheme = isDark) {
-                Scaffold(topBar = {
-                    ActionBar(onAddClick = {
-                        scope.launch {
-                            addModalState.show()
-                            Logger.event("ADD_MODAL_SHEET")
+                Scaffold(
+                    floatingActionButton = {
+                        FloatingActionButton(onClick = {
+                            scope.launch {
+                                addModalState.show()
+                                Logger.event("ADD_MODAL_SHEET")
+                            }
+                        }) {
+                             Icon(painter = painterResource(id = R.drawable.ic_baseline_add_24), contentDescription = "Add")
                         }
-                    }, onSettingsClick = {
-                        settingsDialog = true
-                        Logger.event("SETTINGS_DIALOG")
+                    },
+                    topBar = {
+                        ActionBar(onSettingsClick = {
+                            settingsDialog = true
+                            Logger.event("SETTINGS_DIALOG")
+                        }) {
+                            isDark = !isDark
+                        }
                     }) {
-                        isDark = !isDark
-                    }
-                }) {
                     ModalBottomSheetLayout(
                         sheetState = addModalState,
                         sheetContent = {
@@ -134,8 +142,14 @@ class MainActivity : ComponentActivity() {
                         title = { Text("Settings") },
                         text = {
                             Column {
-                                TextField(value = apiKey, onValueChange = {apiKey = it}, label = {Text("Api Key")})
-                                TextField(value = projectId, onValueChange = {projectId = it}, label = {Text("Project id")})
+                                TextField(
+                                    value = apiKey,
+                                    onValueChange = { apiKey = it },
+                                    label = { Text("Api Key") })
+                                TextField(
+                                    value = projectId,
+                                    onValueChange = { projectId = it },
+                                    label = { Text("Project id") })
                             }
                         },
                         confirmButton = {
