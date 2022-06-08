@@ -44,9 +44,9 @@ fun ToDoItem(
                 }
                 Text(toDo.content, maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
-            IconButton(modifier = Modifier.padding(4.dp), onClick = {onClick(toDo)}) {
-                Icon(painter = painterResource(id = R.drawable.ic_baseline_edit_24 ), contentDescription = "Edit")
-            }
+//            IconButton(modifier = Modifier.padding(4.dp), onClick = {onClick(toDo)}) {
+//                Icon(painter = painterResource(id = R.drawable.ic_baseline_edit_24 ), contentDescription = "Edit")
+//            }
             IconButton(modifier = Modifier.padding(4.dp), onClick = {onDelete(toDo.id)}) {
                 Icon(painter = painterResource(id = R.drawable.ic_baseline_delete_24 ), contentDescription = "Delete")
             }

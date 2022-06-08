@@ -9,7 +9,7 @@ import androidx.compose.ui.res.stringResource
 import com.sanjaydevtech.composetodo.R
 
 @Composable
-fun ActionBar(onAddClick: () -> Unit,onToggle: () -> Unit) {
+fun ActionBar(onAddClick: () -> Unit, onSettingsClick: () -> Unit, onToggle: () -> Unit) {
     var showMenu by remember {
         mutableStateOf(false)
     }
@@ -35,6 +35,12 @@ fun ActionBar(onAddClick: () -> Unit,onToggle: () -> Unit) {
                     showMenu = false
                 }) {
                     Text("Add Todo")
+                }
+                DropdownMenuItem(onClick = {
+                    onSettingsClick()
+                    showMenu = false
+                }) {
+                    Text("Settings")
                 }
             }
         })

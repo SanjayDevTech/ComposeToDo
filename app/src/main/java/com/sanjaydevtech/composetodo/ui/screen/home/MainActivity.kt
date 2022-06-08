@@ -15,8 +15,13 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.sample.library.Config
+import com.sample.library.Logger
+import com.sanjaydevtech.composetodo.getConfig
 import com.sanjaydevtech.composetodo.model.ToDo
+import com.sanjaydevtech.composetodo.setConfig
 import com.sanjaydevtech.composetodo.ui.component.ActionBar
 import com.sanjaydevtech.composetodo.ui.component.ToDoItem
 import com.sanjaydevtech.composetodo.ui.theme.ComposeToDoTheme
@@ -29,25 +34,33 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val context = LocalContext.current
             var isDark by remember {
                 mutableStateOf(false)
             }
-            val modalBottomSheetState =
+            val addModalState =
                 rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+            var settingsDialog by remember {
+                mutableStateOf(false)
+            }
             val scope = rememberCoroutineScope()
             val list = mainViewModel.toDoList
             ComposeToDoTheme(darkTheme = isDark) {
                 Scaffold(topBar = {
                     ActionBar(onAddClick = {
                         scope.launch {
-                            modalBottomSheetState.show()
+                            addModalState.show()
+                            Logger.event("ADD_MODAL_SHEET")
                         }
+                    }, onSettingsClick = {
+                        settingsDialog = true
+                        Logger.event("SETTINGS_DIALOG")
                     }) {
                         isDark = !isDark
                     }
                 }) {
                     ModalBottomSheetLayout(
-                        sheetState = modalBottomSheetState,
+                        sheetState = addModalState,
                         sheetContent = {
                             var title by remember {
                                 mutableStateOf("")
@@ -66,6 +79,7 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 TextField(
                                     value = title,
+                                    singleLine = true,
                                     onValueChange = { title = it },
                                     label = { Text("Title") },
                                 )
@@ -84,8 +98,10 @@ class MainActivity : ComponentActivity() {
                                                 created = System.currentTimeMillis(),
                                             )
                                         )
+                                        title = ""
+                                        content = ""
                                         scope.launch {
-                                           modalBottomSheetState.hide()
+                                            addModalState.hide()
                                         }
                                     }
                                 }) {
@@ -100,6 +116,48 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
+                }
+                if (settingsDialog) {
+                    var apiKey by remember {
+                        mutableStateOf("")
+                    }
+                    var projectId by remember {
+                        mutableStateOf("")
+                    }
+                    LaunchedEffect(settingsDialog) {
+                        val config = context.getConfig()
+                        apiKey = config.apiKey
+                        projectId = config.projectId
+                    }
+                    AlertDialog(
+                        onDismissRequest = { settingsDialog = false },
+                        title = { Text("Settings") },
+                        text = {
+                            Column {
+                                TextField(value = apiKey, onValueChange = {apiKey = it}, label = {Text("Api Key")})
+                                TextField(value = projectId, onValueChange = {projectId = it}, label = {Text("Project id")})
+                            }
+                        },
+                        confirmButton = {
+                            Button(onClick = {
+                                scope.launch {
+                                    val config = Config(
+                                        apiKey = apiKey,
+                                        projectId = projectId,
+                                    )
+                                    context.setConfig(
+                                        config
+                                    )
+                                    Logger.mint(config)
+                                    apiKey = ""
+                                    projectId = ""
+                                    settingsDialog = false
+                                }
+                            }) {
+                                Text("Save")
+                            }
+                        }
+                    )
                 }
             }
         }
